@@ -49,17 +49,48 @@ export function HoldingsPerformanceChart({ holdings }: HoldingsPerformanceChartP
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Holdings Performance</CardTitle>
-        <CardDescription>Top performers by percentage change</CardDescription>
+    <Card className="bg-card/50 backdrop-blur-sm border border-border/50 hover:border-orange-400/30 transition-all duration-300">
+      <CardHeader className="pb-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="text-lg font-bold bg-gradient-to-r from-orange-400 to-amber-400 bg-clip-text text-transparent">
+              Holdings Performance
+            </CardTitle>
+            <CardDescription className="text-muted-foreground/80">
+              Top performers by percentage change
+            </CardDescription>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="text-xs bg-orange-400/20 text-orange-400 px-2 py-1 rounded-full border border-orange-400/30">
+              Top {topHoldings.length}
+            </div>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={topHoldings} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-              <XAxis dataKey="symbol" className="text-xs fill-muted-foreground" axisLine={false} tickLine={false} />
+              <defs>
+                <linearGradient id="positiveBar" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#22c55e" stopOpacity={0.8}/>
+                  <stop offset="100%" stopColor="#22c55e" stopOpacity={0.4}/>
+                </linearGradient>
+                <linearGradient id="negativeBar" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#ef4444" stopOpacity={0.8}/>
+                  <stop offset="100%" stopColor="#ef4444" stopOpacity={0.4}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(148, 163, 184, 0.1)" />
+              <XAxis 
+                dataKey="symbol" 
+                className="text-xs fill-muted-foreground" 
+                axisLine={false} 
+                tickLine={false}
+                angle={-45}
+                textAnchor="end"
+                height={60}
+              />
               <YAxis
                 tickFormatter={formatPercent}
                 className="text-xs fill-muted-foreground"
@@ -69,13 +100,12 @@ export function HoldingsPerformanceChart({ holdings }: HoldingsPerformanceChartP
               <Tooltip content={<CustomTooltip />} />
               <Bar
                 dataKey="unrealizedGainLossPercent"
-                fill={(entry: any) => (entry >= 0 ? "hsl(var(--success))" : "hsl(var(--destructive))")}
-                radius={[2, 2, 0, 0]}
+                radius={[4, 4, 0, 0]}
               >
                 {topHoldings.map((entry, index) => (
                   <Bar
                     key={index}
-                    fill={entry.unrealizedGainLossPercent >= 0 ? "hsl(var(--success))" : "hsl(var(--destructive))"}
+                    fill={entry.unrealizedGainLossPercent >= 0 ? "url(#positiveBar)" : "url(#negativeBar)"}
                   />
                 ))}
               </Bar>

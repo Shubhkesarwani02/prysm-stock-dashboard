@@ -17,7 +17,7 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "prysm-stock-dashboard - Professional Stock Portfolio Tracker",
+  title: "Portfolio Analytics Dashboard - Professional Stock Portfolio Tracker",
   description:
     "Upload your trading data and get comprehensive insights into your portfolio performance with interactive charts and detailed analytics.",
   generator: 'v0.app'

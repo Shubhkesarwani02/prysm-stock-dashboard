@@ -112,36 +112,36 @@ export function HoldingsTable({ holdings, searchTerm, onSearchChange }: Holdings
   }
 
   return (
-    <Card>
+    <Card className="glass hover-lift">
       <CardHeader>
-        <CardTitle>Holdings</CardTitle>
+        <CardTitle className="text-lg font-semibold">Holdings</CardTitle>
         <CardDescription>Your current stock positions</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex items-center gap-4">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-success" />
             <Input
               placeholder="Search holdings..."
               value={searchTerm}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="pl-10"
+              className="pl-10 glass border-success/30 focus:border-success/60"
             />
           </div>
-          <div className="text-sm text-muted-foreground">
+          <div className="text-sm text-muted-foreground glass px-3 py-2 rounded-lg">
             {sortedAndFilteredHoldings.length} of {holdings.length} holdings
           </div>
         </div>
 
-        <div className="rounded-md border">
+        <div className="rounded-md glass overflow-hidden">
           <Table>
             <TableHeader>
-              <TableRow>
+              <TableRow className="border-border/30">
                 <TableHead>
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-8 p-0 font-medium"
+                    className="h-8 p-0 font-medium hover:text-success"
                     onClick={() => handleSort("symbol")}
                   >
                     Symbol
@@ -152,7 +152,7 @@ export function HoldingsTable({ holdings, searchTerm, onSearchChange }: Holdings
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-8 p-0 font-medium"
+                    className="h-8 p-0 font-medium hover:text-info"
                     onClick={() => handleSort("sector")}
                   >
                     Sector
@@ -163,7 +163,7 @@ export function HoldingsTable({ holdings, searchTerm, onSearchChange }: Holdings
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-8 p-0 font-medium"
+                    className="h-8 p-0 font-medium hover:text-accent"
                     onClick={() => handleSort("sharesHeld")}
                   >
                     Shares
@@ -174,7 +174,7 @@ export function HoldingsTable({ holdings, searchTerm, onSearchChange }: Holdings
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-8 p-0 font-medium"
+                    className="h-8 p-0 font-medium hover:text-warning"
                     onClick={() => handleSort("avgCostBasis")}
                   >
                     Avg Cost
@@ -185,7 +185,7 @@ export function HoldingsTable({ holdings, searchTerm, onSearchChange }: Holdings
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-8 p-0 font-medium"
+                    className="h-8 p-0 font-medium hover:text-success"
                     onClick={() => handleSort("currentPrice")}
                   >
                     Current Price
@@ -196,7 +196,7 @@ export function HoldingsTable({ holdings, searchTerm, onSearchChange }: Holdings
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-8 p-0 font-medium"
+                    className="h-8 p-0 font-medium hover:text-info"
                     onClick={() => handleSort("currentValue")}
                   >
                     Market Value
@@ -207,7 +207,7 @@ export function HoldingsTable({ holdings, searchTerm, onSearchChange }: Holdings
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-8 p-0 font-medium"
+                    className="h-8 p-0 font-medium hover:text-accent"
                     onClick={() => handleSort("unrealizedGainLoss")}
                   >
                     Unrealized P&L

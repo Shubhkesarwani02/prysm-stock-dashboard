@@ -43,8 +43,8 @@ export default function HomePage() {
         {!portfolioData ? (
           <div className="space-y-8">
             <div className="text-center">
-              <h1 className="text-4xl font-bold text-balance mb-4">
-                prysm<span className="text-primary">-stock-dashboard</span>
+              <h1 className="text-4xl font-bold text-balance mb-4 bg-gradient-to-r from-orange-400 via-amber-400 to-orange-400 bg-clip-text text-transparent">
+                Portfolio Analytics Dashboard
               </h1>
               <p className="text-lg text-muted-foreground text-pretty max-w-2xl mx-auto">
                 Upload your trading data and get comprehensive insights into your portfolio performance with interactive

@@ -10,16 +10,16 @@ interface PortfolioAllocationChartProps {
 }
 
 const COLORS = [
-  "hsl(var(--primary))",
-  "hsl(var(--secondary))",
-  "hsl(var(--accent))",
-  "hsl(var(--muted))",
-  "#8884d8",
-  "#82ca9d",
-  "#ffc658",
-  "#ff7300",
-  "#00ff00",
-  "#ff00ff",
+  "#f97316", // orange-500 - primary
+  "#fb923c", // orange-400
+  "#fdba74", // orange-300  
+  "#fed7aa", // orange-200
+  "#ffedd5", // orange-100
+  "#22d3ee", // cyan-400
+  "#60a5fa", // blue-400
+  "#34d399", // emerald-400
+  "#fbbf24", // amber-400
+  "#a78bfa", // violet-400
 ]
 
 export function PortfolioAllocationChart({ holdings }: PortfolioAllocationChartProps) {
@@ -77,13 +77,27 @@ export function PortfolioAllocationChart({ holdings }: PortfolioAllocationChartP
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Portfolio Allocation</CardTitle>
-        <CardDescription>Breakdown by sector</CardDescription>
+    <Card className="bg-card/50 backdrop-blur-sm border border-border/50 hover:border-orange-400/30 transition-all duration-300">
+      <CardHeader className="pb-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="text-lg font-bold bg-gradient-to-r from-orange-400 to-amber-400 bg-clip-text text-transparent">
+              Portfolio Allocation
+            </CardTitle>
+            <CardDescription className="text-muted-foreground/80">
+              Asset distribution by sector
+            </CardDescription>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-2 w-2 rounded-full bg-orange-400 animate-pulse"></div>
+            <span className="text-xs text-muted-foreground font-medium">
+              {allocationData.length} sectors
+            </span>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
-        <div className="h-80">
+        <div className="h-80 relative">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -91,19 +105,35 @@ export function PortfolioAllocationChart({ holdings }: PortfolioAllocationChartP
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({ percentage }) => `${percentage.toFixed(1)}%`}
-                outerRadius={80}
+                label={({ percentage }: any) => `${percentage.toFixed(1)}%`}
+                outerRadius={100}
+                innerRadius={40}
                 fill="#8884d8"
                 dataKey="value"
+                stroke="rgba(30, 41, 59, 0.5)"
+                strokeWidth={2}
               >
                 {allocationData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Cell 
+                    key={`cell-${index}`} 
+                    fill={COLORS[index % COLORS.length]}
+                  />
                 ))}
               </Pie>
               <Tooltip content={<CustomTooltip />} />
               <Legend content={<CustomLegend />} />
             </PieChart>
           </ResponsiveContainer>
+          
+          {/* Center Summary */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="text-center">
+              <div className="text-sm font-bold text-orange-400">
+                {formatCurrency(allocationData.reduce((sum, item) => sum + item.value, 0))}
+              </div>
+              <div className="text-xs text-muted-foreground">Total Value</div>
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>

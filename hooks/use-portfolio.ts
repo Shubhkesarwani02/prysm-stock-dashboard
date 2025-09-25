@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react"
 import type { PortfolioData, Trade, FilterState } from "@/lib/types"
 import { processPortfolioData, savePortfolioData, loadPortfolioData, clearPortfolioData } from "@/lib/portfolio-utils"
-import { useDebouncedValue } from "./use-debounced-value"
 
 export function usePortfolio() {
   const [portfolioData, setPortfolioData] = useState<PortfolioData | null>(null)
@@ -13,9 +12,6 @@ export function usePortfolio() {
     dateRange: { start: "", end: "" },
     searchTerm: "",
   })
-
-  // Debounce search term for better performance
-  const debouncedSearchTerm = useDebouncedValue(filters.searchTerm, 300)
 
   // Load data from localStorage on mount
   useEffect(() => {
@@ -57,14 +53,14 @@ export function usePortfolio() {
         return false
       }
 
-      // Search filter (debounced)
-      if (debouncedSearchTerm && !holding.symbol.toLowerCase().includes(debouncedSearchTerm.toLowerCase())) {
+      // Search filter
+      if (filters.searchTerm && !holding.symbol.toLowerCase().includes(filters.searchTerm.toLowerCase())) {
         return false
       }
 
       return true
     })
-  }, [portfolioData, filters.sector, debouncedSearchTerm])
+  }, [portfolioData, filters.sector, filters.searchTerm])
 
   // Apply date range filter to trades with memoization
   const filteredTrades = useMemo(() => {
