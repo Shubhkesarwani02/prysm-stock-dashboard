@@ -153,19 +153,19 @@ export function CSVUpload({ onDataParsed }: CSVUploadProps) {
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader className="px-4 sm:px-6">
-        <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-          <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <FileText className="h-5 w-5 text-primary" />
           Upload Portfolio Data
         </CardTitle>
-        <CardDescription className="text-sm sm:text-base">
+        <CardDescription>
           Upload a CSV file with your stock trades to analyze your portfolio performance
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4 px-4 sm:px-6">
+      <CardContent className="space-y-4">
         <div
           className={`
-            relative border-2 border-dashed rounded-lg p-4 sm:p-8 text-center transition-colors
+            relative border-2 border-dashed rounded-lg p-8 text-center transition-colors
             ${isDragging ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"}
             ${isProcessing ? "opacity-50 pointer-events-none" : ""}
           `}
@@ -174,18 +174,18 @@ export function CSVUpload({ onDataParsed }: CSVUploadProps) {
           onDragEnter={() => setIsDragging(true)}
           onDragLeave={() => setIsDragging(false)}
         >
-          <div className="flex flex-col items-center gap-3 sm:gap-4">
+          <div className="flex flex-col items-center gap-4">
             <div
               className={`
-              p-2 sm:p-3 rounded-full transition-colors
+              p-3 rounded-full transition-colors
               ${isDragging ? "bg-primary text-primary-foreground" : "bg-muted"}
             `}
             >
-              <Upload className="h-5 w-5 sm:h-6 sm:w-6" />
+              <Upload className="h-6 w-6" />
             </div>
 
             <div className="space-y-2">
-              <p className="text-sm font-medium px-2">
+              <p className="text-sm font-medium">
                 {isProcessing ? "Processing..." : "Drop your CSV file here, or click to browse"}
               </p>
               <p className="text-xs text-muted-foreground">Expected format: symbol, shares, price, date</p>
@@ -200,7 +200,7 @@ export function CSVUpload({ onDataParsed }: CSVUploadProps) {
               disabled={isProcessing}
             />
 
-            <Button variant="outline" size="sm" disabled={isProcessing} className="touch-target">
+            <Button variant="outline" size="sm" disabled={isProcessing}>
               {isProcessing ? "Processing..." : "Browse Files"}
             </Button>
           </div>
@@ -208,7 +208,7 @@ export function CSVUpload({ onDataParsed }: CSVUploadProps) {
 
         {isProcessing && uploadProgress > 0 && (
           <div className="space-y-2">
-            <div className="flex justify-between text-xs sm:text-sm">
+            <div className="flex justify-between text-sm">
               <span>Processing CSV...</span>
               <span>{uploadProgress}%</span>
             </div>
@@ -219,35 +219,33 @@ export function CSVUpload({ onDataParsed }: CSVUploadProps) {
         {error && (
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
-            <AlertDescription className="text-sm">{error}</AlertDescription>
+            <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
 
         {warning && (
           <Alert className="border-warning text-warning">
             <AlertTriangle className="h-4 w-4" />
-            <AlertDescription className="text-sm">{warning}</AlertDescription>
+            <AlertDescription>{warning}</AlertDescription>
           </Alert>
         )}
 
         {success && (
           <Alert className="border-success text-success">
             <CheckCircle className="h-4 w-4" />
-            <AlertDescription className="text-sm">{success}</AlertDescription>
+            <AlertDescription>{success}</AlertDescription>
           </Alert>
         )}
 
-        <div className="bg-muted/50 rounded-lg p-3 sm:p-4">
+        <div className="bg-muted/50 rounded-lg p-4">
           <h4 className="text-sm font-medium mb-2">CSV Format Example:</h4>
-          <div className="overflow-x-auto">
-            <pre className="text-xs text-muted-foreground font-mono whitespace-pre">
-              {`symbol,shares,price,date
+          <pre className="text-xs text-muted-foreground font-mono">
+            {`symbol,shares,price,date
 AAPL,10,172.35,2024-06-12
 TSLA,5,225.40,2024-06-13
 AAPL,-3,180.00,2024-07-01`}
-            </pre>
-          </div>
-          <div className="mt-2 text-xs text-muted-foreground space-y-1">
+          </pre>
+          <div className="mt-2 text-xs text-muted-foreground">
             <p>• Symbol: Stock ticker (e.g., AAPL, TSLA)</p>
             <p>• Shares: Number of shares (positive for buy, negative for sell)</p>
             <p>• Price: Price per share in USD</p>

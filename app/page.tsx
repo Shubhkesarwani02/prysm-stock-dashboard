@@ -39,18 +39,18 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-2 sm:px-4 lg:px-6 py-4 sm:py-8">
+      <div className="container mx-auto px-4 py-8">
         {!portfolioData ? (
-          <div className="space-y-6 sm:space-y-8">
-            <div className="text-center px-4 sm:px-0">
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-balance mb-3 sm:mb-4 bg-gradient-to-r from-orange-400 via-amber-400 to-orange-400 bg-clip-text text-transparent">
+          <div className="space-y-8">
+            <div className="text-center">
+              <h1 className="text-4xl font-bold text-balance mb-4 bg-gradient-to-r from-orange-400 via-amber-400 to-orange-400 bg-clip-text text-transparent">
                 Portfolio Analytics Dashboard
               </h1>
-              <p className="text-base sm:text-lg text-muted-foreground text-pretty max-w-2xl mx-auto px-2 sm:px-0">
+              <p className="text-lg text-muted-foreground text-pretty max-w-2xl mx-auto">
                 Upload your trading data and get comprehensive insights into your portfolio performance with interactive
                 charts and detailed analytics.
               </p>
-              <div className="mt-6 sm:mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 max-w-4xl mx-auto text-sm text-muted-foreground">
+              <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto text-sm text-muted-foreground">
                 <div className="flex items-center justify-center gap-2 p-3 rounded-lg bg-muted/50">
                   <span className="w-2 h-2 bg-chart-1 rounded-full"></span>
                   Interactive Charts
@@ -59,7 +59,7 @@ export default function HomePage() {
                   <span className="w-2 h-2 bg-chart-2 rounded-full"></span>
                   Performance Analytics
                 </div>
-                <div className="flex items-center justify-center gap-2 p-3 rounded-lg bg-muted/50 sm:col-span-2 lg:col-span-1">
+                <div className="flex items-center justify-center gap-2 p-3 rounded-lg bg-muted/50">
                   <span className="w-2 h-2 bg-chart-3 rounded-full"></span>
                   Risk Assessment
                 </div>
@@ -72,7 +72,7 @@ export default function HomePage() {
         )}
       </div>
       {portfolioData && (
-        <div className="fixed bottom-2 sm:bottom-4 right-2 sm:right-4 text-xs text-muted-foreground bg-muted/80 backdrop-blur-sm px-2 py-1 rounded z-50">
+        <div className="fixed bottom-4 right-4 text-xs text-muted-foreground bg-muted/80 backdrop-blur-sm px-2 py-1 rounded">
           Press <kbd className="px-1 py-0.5 bg-background rounded text-xs">Esc</kbd> to clear data
         </div>
       )}
