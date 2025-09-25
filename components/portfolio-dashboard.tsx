@@ -61,44 +61,48 @@ export function PortfolioDashboard({ portfolioData, onClearData }: PortfolioDash
   return (
     <TooltipProvider>
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-        <div className="container mx-auto px-6 py-8 space-y-8">
+        <div className="container mx-auto px-2 sm:px-4 lg:px-6 py-4 sm:py-8 space-y-6 sm:space-y-8">
           {/* Header */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="bg-card/50 backdrop-blur-sm border border-border/50 p-6 rounded-xl">
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-400 to-amber-400 bg-clip-text text-transparent">
-                Portfolio Tracker
-              </h1>
-              <p className="text-muted-foreground mt-2">
-                Last updated:{" "}
-                {new Date().toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </p>
-              <div className="flex items-center gap-4 mt-3 text-sm">
-                <span className="bg-orange-400/20 border border-orange-400/30 px-3 py-1 rounded-full text-orange-400 font-medium">
-                  {portfolioData.holdings.length} holdings
-                </span>
-                <span className="bg-green-400/20 border border-green-400/30 px-3 py-1 rounded-full text-green-400 font-medium">
-                  {portfolioData.trades.length} trades
-                </span>
-                <span className="bg-blue-400/20 border border-blue-400/30 px-3 py-1 rounded-full text-blue-400 font-medium">
-                  {portfolioData.metrics.uniqueSymbols} symbols
-                </span>
+          <div className="flex flex-col gap-4">
+            <div className="bg-card/50 backdrop-blur-sm border border-border/50 p-4 sm:p-6 rounded-xl">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex-1 min-w-0">
+                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-orange-400 to-amber-400 bg-clip-text text-transparent">
+                    Portfolio Tracker
+                  </h1>
+                  <p className="text-muted-foreground mt-2 text-sm sm:text-base">
+                    Last updated:{" "}
+                    {new Date().toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-3 text-xs sm:text-sm">
+                    <span className="bg-orange-400/20 border border-orange-400/30 px-2 sm:px-3 py-1 rounded-full text-orange-400 font-medium whitespace-nowrap">
+                      {portfolioData.holdings.length} holdings
+                    </span>
+                    <span className="bg-green-400/20 border border-green-400/30 px-2 sm:px-3 py-1 rounded-full text-green-400 font-medium whitespace-nowrap">
+                      {portfolioData.trades.length} trades
+                    </span>
+                    <span className="bg-blue-400/20 border border-blue-400/30 px-2 sm:px-3 py-1 rounded-full text-blue-400 font-medium whitespace-nowrap">
+                      {portfolioData.metrics.uniqueSymbols} symbols
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                  <Button variant="outline" size="sm" onClick={handleExportData} className="flex-1 sm:flex-initial border-orange-400/20 text-orange-400 hover:bg-orange-400/10">
+                    <Download className="h-4 w-4 sm:mr-2" />
+                    <span className="hidden sm:inline">Export</span>
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={handleClearData} className="flex-1 sm:flex-initial border-red-400/20 text-red-400 hover:bg-red-400/10">
+                    <Trash2 className="h-4 w-4 sm:mr-2" />
+                    <span className="hidden sm:inline">Clear</span>
+                  </Button>
+                </div>
               </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <Button variant="outline" size="sm" onClick={handleExportData} className="border-orange-400/20 text-orange-400 hover:bg-orange-400/10">
-                <Download className="h-4 w-4 mr-2" />
-                Export
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleClearData} className="border-red-400/20 text-red-400 hover:bg-red-400/10">
-                <Trash2 className="h-4 w-4 mr-2" />
-                Clear
-              </Button>
             </div>
           </div>
 
@@ -106,72 +110,78 @@ export function PortfolioDashboard({ portfolioData, onClearData }: PortfolioDash
           <PortfolioOverview metrics={displayMetrics} />
 
           {/* Filters */}
-          <div className="bg-card/50 backdrop-blur-sm border border-border/50 p-4 rounded-xl">
+          <div className="bg-card/50 backdrop-blur-sm border border-border/50 p-3 sm:p-4 rounded-xl">
             <FiltersPanel filters={filters} holdings={portfolioData.holdings} onFiltersChange={updateFilters} />
           </div>
 
           {/* Main Content */}
-          <div className="bg-card/50 backdrop-blur-sm border border-border/50 p-6 rounded-xl">
-            <Tabs defaultValue="overview" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-5 bg-card/50 backdrop-blur-sm border border-border/50">
-                <TabsTrigger value="overview" className="flex items-center gap-2 data-[state=active]:bg-orange-400/20 data-[state=active]:text-orange-400">
-                  <BarChart3 className="h-4 w-4" />
-                  Overview
-                </TabsTrigger>
-                <TabsTrigger value="performance" className="data-[state=active]:bg-orange-400/20 data-[state=active]:text-orange-400">
-                  Performance
-                </TabsTrigger>
-                <TabsTrigger value="holdings" className="data-[state=active]:bg-orange-400/20 data-[state=active]:text-orange-400">
-                  Holdings
-                </TabsTrigger>
-                <TabsTrigger value="analytics" className="data-[state=active]:bg-orange-400/20 data-[state=active]:text-orange-400">
-                  Analytics
-                </TabsTrigger>
-                <TabsTrigger value="enhanced" className="data-[state=active]:bg-orange-400/20 data-[state=active]:text-orange-400">
-                  Enhanced ✨
-                </TabsTrigger>
-              </TabsList>
+          <div className="bg-card/50 backdrop-blur-sm border border-border/50 p-3 sm:p-6 rounded-xl">
+            <Tabs defaultValue="overview" className="space-y-4 sm:space-y-6">
+              <div className="overflow-x-auto">
+                <TabsList className="grid w-full grid-cols-5 bg-card/50 backdrop-blur-sm border border-border/50 min-w-max">
+                  <TabsTrigger value="overview" className="flex items-center gap-1 sm:gap-2 data-[state=active]:bg-orange-400/20 data-[state=active]:text-orange-400 text-xs sm:text-sm px-2 sm:px-3">
+                    <BarChart3 className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <span className="hidden xs:inline">Overview</span>
+                    <span className="xs:hidden">Over</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="performance" className="data-[state=active]:bg-orange-400/20 data-[state=active]:text-orange-400 text-xs sm:text-sm px-2 sm:px-3">
+                    <span className="hidden sm:inline">Performance</span>
+                    <span className="sm:hidden">Perf</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="holdings" className="data-[state=active]:bg-orange-400/20 data-[state=active]:text-orange-400 text-xs sm:text-sm px-2 sm:px-3">
+                    Holdings
+                  </TabsTrigger>
+                  <TabsTrigger value="analytics" className="data-[state=active]:bg-orange-400/20 data-[state=active]:text-orange-400 text-xs sm:text-sm px-2 sm:px-3">
+                    <span className="hidden sm:inline">Analytics</span>
+                    <span className="sm:hidden">Stats</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="enhanced" className="data-[state=active]:bg-orange-400/20 data-[state=active]:text-orange-400 text-xs sm:text-sm px-2 sm:px-3">
+                    <span className="hidden sm:inline">Enhanced ✨</span>
+                    <span className="sm:hidden">✨</span>
+                  </TabsTrigger>
+                </TabsList>
+              </div>
 
-              <TabsContent value="overview" className="space-y-6">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <TabsContent value="overview" className="space-y-4 sm:space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                   <PortfolioAllocationChart holdings={displayHoldings} />
                   <PortfolioPerformanceChart data={portfolioData.portfolioHistory} />
                 </div>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                   <HoldingsPerformanceChart holdings={displayHoldings} />
                   <RiskMetricsChart holdings={displayHoldings} />
                 </div>
               </TabsContent>
 
-              <TabsContent value="performance" className="space-y-6">
-                <div className="grid grid-cols-1 gap-6">
+              <TabsContent value="performance" className="space-y-4 sm:space-y-6">
+                <div className="grid grid-cols-1 gap-4 sm:gap-6">
                   <PortfolioPerformanceChart data={portfolioData.portfolioHistory} />
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                     <HoldingsPerformanceChart holdings={displayHoldings} />
                     <RiskMetricsChart holdings={displayHoldings} />
                   </div>
                 </div>
               </TabsContent>
 
-              <TabsContent value="holdings" className="space-y-6">
+              <TabsContent value="holdings" className="space-y-4 sm:space-y-6">
                 <HoldingsTable holdings={displayHoldings} searchTerm={searchTerm} onSearchChange={setSearchTerm} />
               </TabsContent>
 
-              <TabsContent value="analytics" className="space-y-6">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <TabsContent value="analytics" className="space-y-4 sm:space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                   <PortfolioAllocationChart holdings={displayHoldings} />
                   <RiskMetricsChart holdings={displayHoldings} />
                 </div>
-                <div className="grid grid-cols-1 gap-6">
+                <div className="grid grid-cols-1 gap-4 sm:gap-6">
                   <HoldingsPerformanceChart holdings={displayHoldings} />
                 </div>
               </TabsContent>
 
-              <TabsContent value="enhanced" className="space-y-8">
-                <div className="space-y-6">
+              <TabsContent value="enhanced" className="space-y-6 sm:space-y-8">
+                <div className="space-y-4 sm:space-y-6">
                   <EnhancedKPIs metrics={displayMetrics} />
                 </div>
-                <div className="grid grid-cols-1 gap-6">
+                <div className="grid grid-cols-1 gap-4 sm:gap-6">
                   <HoldingsTable holdings={displayHoldings} searchTerm="" onSearchChange={() => {}} />
                 </div>
               </TabsContent>

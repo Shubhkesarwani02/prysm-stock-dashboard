@@ -1,12 +1,13 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { ArrowUpDown, ArrowUp, ArrowDown, Search, TrendingUp, TrendingDown } from "lucide-react"
+import { ArrowUpDown, ArrowUp, ArrowDown, Search, TrendingUp, TrendingDown, MoreVertical } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { useIsMobile, useResponsive } from "@/hooks/use-mobile"
 import type { Holding } from "@/lib/types"
 
 interface HoldingsTableProps {
@@ -19,11 +20,16 @@ type SortField = keyof Holding
 type SortDirection = "asc" | "desc"
 
 const ITEMS_PER_PAGE = 10
+const MOBILE_ITEMS_PER_PAGE = 5
 
 export function HoldingsTable({ holdings, searchTerm, onSearchChange }: HoldingsTableProps) {
   const [sortField, setSortField] = useState<SortField>("currentValue")
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc")
   const [currentPage, setCurrentPage] = useState(1)
+  const isMobile = useIsMobile()
+  const { isMobile: isResponsiveMobile } = useResponsive()
+  
+  const itemsPerPage = isResponsiveMobile ? MOBILE_ITEMS_PER_PAGE : ITEMS_PER_PAGE
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -56,9 +62,9 @@ export function HoldingsTable({ holdings, searchTerm, onSearchChange }: Holdings
     return filtered
   }, [holdings, searchTerm, sortField, sortDirection])
 
-  const totalPages = Math.ceil(sortedAndFilteredHoldings.length / ITEMS_PER_PAGE)
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
-  const paginatedHoldings = sortedAndFilteredHoldings.slice(startIndex, startIndex + ITEMS_PER_PAGE)
+  const totalPages = Math.ceil(sortedAndFilteredHoldings.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const paginatedHoldings = sortedAndFilteredHoldings.slice(startIndex, startIndex + itemsPerPage)
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -97,6 +103,68 @@ export function HoldingsTable({ holdings, searchTerm, onSearchChange }: Holdings
     return colors[sector] || colors.Unknown
   }
 
+  // Mobile card view component
+  const MobileHoldingCard = ({ holding }: { holding: Holding }) => (
+    <Card className="bg-card/50 backdrop-blur-sm border border-border/50 hover:border-orange-400/30 transition-colors">
+      <CardContent className="p-4">
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-lg">{holding.symbol}</span>
+            {holding.unrealizedGainLossPercent >= 0 ? (
+              <TrendingUp className="h-4 w-4 text-success" />
+            ) : (
+              <TrendingDown className="h-4 w-4 text-destructive" />
+            )}
+          </div>
+          <Badge variant="secondary" className={getSectorColor(holding.sector)}>
+            {holding.sector}
+          </Badge>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <span className="text-muted-foreground">Shares:</span>
+            <div className="font-mono font-medium">{formatShares(holding.sharesHeld)}</div>
+          </div>
+          <div>
+            <span className="text-muted-foreground">Avg Cost:</span>
+            <div className="font-mono font-medium">{formatCurrency(holding.avgCostBasis)}</div>
+          </div>
+          <div>
+            <span className="text-muted-foreground">Current Price:</span>
+            <div className="font-mono font-medium">{formatCurrency(holding.currentPrice)}</div>
+          </div>
+          <div>
+            <span className="text-muted-foreground">Market Value:</span>
+            <div className="font-mono font-bold">{formatCurrency(holding.currentValue)}</div>
+          </div>
+        </div>
+        
+        <div className="mt-3 pt-3 border-t border-border/50">
+          <div className="text-center">
+            <span className="text-muted-foreground text-sm">Unrealized P&L:</span>
+            <div className="flex items-center justify-center gap-2 mt-1">
+              <span
+                className={`font-mono font-bold text-lg ${
+                  holding.unrealizedGainLoss >= 0 ? "text-success" : "text-destructive"
+                }`}
+              >
+                {formatCurrency(holding.unrealizedGainLoss)}
+              </span>
+              <span
+                className={`text-sm font-medium ${
+                  holding.unrealizedGainLossPercent >= 0 ? "text-success" : "text-destructive"
+                }`}
+              >
+                ({formatPercent(holding.unrealizedGainLossPercent)})
+              </span>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+
   if (holdings.length === 0) {
     return (
       <Card>
@@ -118,7 +186,8 @@ export function HoldingsTable({ holdings, searchTerm, onSearchChange }: Holdings
         <CardDescription>Your current stock positions</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex items-center gap-4">
+        {/* Search and Controls */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-success" />
             <Input
@@ -128,146 +197,190 @@ export function HoldingsTable({ holdings, searchTerm, onSearchChange }: Holdings
               className="pl-10 glass border-success/30 focus:border-success/60"
             />
           </div>
-          <div className="text-sm text-muted-foreground glass px-3 py-2 rounded-lg">
+          <div className="text-sm text-muted-foreground glass px-3 py-2 rounded-lg text-center sm:text-left whitespace-nowrap">
             {sortedAndFilteredHoldings.length} of {holdings.length} holdings
           </div>
         </div>
 
-        <div className="rounded-md glass overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow className="border-border/30">
-                <TableHead>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 p-0 font-medium hover:text-success"
-                    onClick={() => handleSort("symbol")}
-                  >
-                    Symbol
-                    {getSortIcon("symbol")}
-                  </Button>
-                </TableHead>
-                <TableHead>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 p-0 font-medium hover:text-info"
-                    onClick={() => handleSort("sector")}
-                  >
-                    Sector
-                    {getSortIcon("sector")}
-                  </Button>
-                </TableHead>
-                <TableHead className="text-right">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 p-0 font-medium hover:text-accent"
-                    onClick={() => handleSort("sharesHeld")}
-                  >
-                    Shares
-                    {getSortIcon("sharesHeld")}
-                  </Button>
-                </TableHead>
-                <TableHead className="text-right">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 p-0 font-medium hover:text-warning"
-                    onClick={() => handleSort("avgCostBasis")}
-                  >
-                    Avg Cost
-                    {getSortIcon("avgCostBasis")}
-                  </Button>
-                </TableHead>
-                <TableHead className="text-right">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 p-0 font-medium hover:text-success"
-                    onClick={() => handleSort("currentPrice")}
-                  >
-                    Current Price
-                    {getSortIcon("currentPrice")}
-                  </Button>
-                </TableHead>
-                <TableHead className="text-right">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 p-0 font-medium hover:text-info"
-                    onClick={() => handleSort("currentValue")}
-                  >
-                    Market Value
-                    {getSortIcon("currentValue")}
-                  </Button>
-                </TableHead>
-                <TableHead className="text-right">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 p-0 font-medium hover:text-accent"
-                    onClick={() => handleSort("unrealizedGainLoss")}
-                  >
-                    Unrealized P&L
-                    {getSortIcon("unrealizedGainLoss")}
-                  </Button>
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+        {/* Mobile View - Cards */}
+        {isResponsiveMobile ? (
+          <div className="space-y-4">
+            {/* Mobile Sort Controls */}
+            <div className="flex gap-2 overflow-x-auto pb-2">
+              <Button
+                variant={sortField === "currentValue" ? "default" : "outline"}
+                size="sm"
+                onClick={() => handleSort("currentValue")}
+                className="whitespace-nowrap"
+              >
+                Market Value {getSortIcon("currentValue")}
+              </Button>
+              <Button
+                variant={sortField === "unrealizedGainLoss" ? "default" : "outline"}
+                size="sm"
+                onClick={() => handleSort("unrealizedGainLoss")}
+                className="whitespace-nowrap"
+              >
+                P&L {getSortIcon("unrealizedGainLoss")}
+              </Button>
+              <Button
+                variant={sortField === "symbol" ? "default" : "outline"}
+                size="sm"
+                onClick={() => handleSort("symbol")}
+                className="whitespace-nowrap"
+              >
+                Symbol {getSortIcon("symbol")}
+              </Button>
+            </div>
+            
+            {/* Mobile Cards */}
+            <div className="space-y-3">
               {paginatedHoldings.map((holding) => (
-                <TableRow key={holding.symbol} className="hover:bg-muted/50">
-                  <TableCell className="font-medium">
-                    <div className="flex items-center gap-2">
-                      {holding.symbol}
-                      {holding.unrealizedGainLossPercent >= 0 ? (
-                        <TrendingUp className="h-4 w-4 text-success" />
-                      ) : (
-                        <TrendingDown className="h-4 w-4 text-destructive" />
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="secondary" className={getSectorColor(holding.sector)}>
-                      {holding.sector}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right font-mono">{formatShares(holding.sharesHeld)}</TableCell>
-                  <TableCell className="text-right font-mono">{formatCurrency(holding.avgCostBasis)}</TableCell>
-                  <TableCell className="text-right font-mono">{formatCurrency(holding.currentPrice)}</TableCell>
-                  <TableCell className="text-right font-mono font-medium">
-                    {formatCurrency(holding.currentValue)}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex flex-col items-end">
-                      <span
-                        className={`font-mono font-medium ${
-                          holding.unrealizedGainLoss >= 0 ? "text-success" : "text-destructive"
-                        }`}
-                      >
-                        {formatCurrency(holding.unrealizedGainLoss)}
-                      </span>
-                      <span
-                        className={`text-xs ${
-                          holding.unrealizedGainLossPercent >= 0 ? "text-success" : "text-destructive"
-                        }`}
-                      >
-                        {formatPercent(holding.unrealizedGainLossPercent)}
-                      </span>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                <MobileHoldingCard key={holding.symbol} holding={holding} />
               ))}
-            </TableBody>
-          </Table>
-        </div>
+            </div>
+          </div>
+        ) : (
+          /* Desktop View - Table */
+          <div className="rounded-md glass overflow-hidden">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-border/30">
+                    <TableHead>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 p-0 font-medium hover:text-success"
+                        onClick={() => handleSort("symbol")}
+                      >
+                        Symbol
+                        {getSortIcon("symbol")}
+                      </Button>
+                    </TableHead>
+                    <TableHead>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 p-0 font-medium hover:text-info"
+                        onClick={() => handleSort("sector")}
+                      >
+                        Sector
+                        {getSortIcon("sector")}
+                      </Button>
+                    </TableHead>
+                    <TableHead className="text-right">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 p-0 font-medium hover:text-accent"
+                        onClick={() => handleSort("sharesHeld")}
+                      >
+                        Shares
+                        {getSortIcon("sharesHeld")}
+                      </Button>
+                    </TableHead>
+                    <TableHead className="text-right">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 p-0 font-medium hover:text-warning"
+                        onClick={() => handleSort("avgCostBasis")}
+                      >
+                        Avg Cost
+                        {getSortIcon("avgCostBasis")}
+                      </Button>
+                    </TableHead>
+                    <TableHead className="text-right">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 p-0 font-medium hover:text-success"
+                        onClick={() => handleSort("currentPrice")}
+                      >
+                        Current Price
+                        {getSortIcon("currentPrice")}
+                      </Button>
+                    </TableHead>
+                    <TableHead className="text-right">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 p-0 font-medium hover:text-info"
+                        onClick={() => handleSort("currentValue")}
+                      >
+                        Market Value
+                        {getSortIcon("currentValue")}
+                      </Button>
+                    </TableHead>
+                    <TableHead className="text-right">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 p-0 font-medium hover:text-accent"
+                        onClick={() => handleSort("unrealizedGainLoss")}
+                      >
+                        Unrealized P&L
+                        {getSortIcon("unrealizedGainLoss")}
+                      </Button>
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {paginatedHoldings.map((holding) => (
+                    <TableRow key={holding.symbol} className="hover:bg-muted/50">
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-2">
+                          {holding.symbol}
+                          {holding.unrealizedGainLossPercent >= 0 ? (
+                            <TrendingUp className="h-4 w-4 text-success" />
+                          ) : (
+                            <TrendingDown className="h-4 w-4 text-destructive" />
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="secondary" className={getSectorColor(holding.sector)}>
+                          {holding.sector}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right font-mono">{formatShares(holding.sharesHeld)}</TableCell>
+                      <TableCell className="text-right font-mono">{formatCurrency(holding.avgCostBasis)}</TableCell>
+                      <TableCell className="text-right font-mono">{formatCurrency(holding.currentPrice)}</TableCell>
+                      <TableCell className="text-right font-mono font-medium">
+                        {formatCurrency(holding.currentValue)}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex flex-col items-end">
+                          <span
+                            className={`font-mono font-medium ${
+                              holding.unrealizedGainLoss >= 0 ? "text-success" : "text-destructive"
+                            }`}
+                          >
+                            {formatCurrency(holding.unrealizedGainLoss)}
+                          </span>
+                          <span
+                            className={`text-xs ${
+                              holding.unrealizedGainLossPercent >= 0 ? "text-success" : "text-destructive"
+                            }`}
+                          >
+                            {formatPercent(holding.unrealizedGainLossPercent)}
+                          </span>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
+        )}
 
+        {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between">
-            <div className="text-sm text-muted-foreground">
-              Showing {startIndex + 1} to {Math.min(startIndex + ITEMS_PER_PAGE, sortedAndFilteredHoldings.length)} of{" "}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="text-sm text-muted-foreground text-center sm:text-left">
+              Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, sortedAndFilteredHoldings.length)} of{" "}
               {sortedAndFilteredHoldings.length} results
             </div>
             <div className="flex items-center gap-2">
@@ -280,8 +393,9 @@ export function HoldingsTable({ holdings, searchTerm, onSearchChange }: Holdings
                 Previous
               </Button>
               <div className="flex items-center gap-1">
-                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                  const pageNum = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i
+                {Array.from({ length: Math.min(isResponsiveMobile ? 3 : 5, totalPages) }, (_, i) => {
+                  const maxPages = isResponsiveMobile ? 3 : 5
+                  const pageNum = Math.max(1, Math.min(totalPages - (maxPages - 1), currentPage - Math.floor(maxPages / 2))) + i
                   return (
                     <Button
                       key={pageNum}

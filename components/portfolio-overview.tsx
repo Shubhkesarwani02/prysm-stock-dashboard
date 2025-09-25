@@ -22,17 +22,17 @@ export function PortfolioOverview({ metrics }: PortfolioOverviewProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
       {/* Total Portfolio Value */}
       <Card className="relative overflow-hidden bg-card/50 backdrop-blur-sm border border-orange-400/20">
         <div className="absolute inset-0 bg-gradient-to-br from-orange-400/10 to-amber-400/5"></div>
         <div className="absolute top-0 right-0 w-20 h-20 bg-orange-400/20 rounded-full blur-xl"></div>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
           <CardTitle className="text-sm font-medium text-muted-foreground">Total Portfolio Value</CardTitle>
-          <DollarSign className="h-5 w-5 text-orange-400" />
+          <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 text-orange-400" />
         </CardHeader>
         <CardContent className="relative z-10">
-          <div className="text-3xl font-bold text-orange-400">
+          <div className="text-2xl sm:text-3xl font-bold text-orange-400">
             {formatCurrency(metrics.totalValue)}
           </div>
           <p className="text-xs text-muted-foreground mt-1">
@@ -48,19 +48,19 @@ export function PortfolioOverview({ metrics }: PortfolioOverviewProps) {
         <div className={`absolute inset-0 ${
           metrics.totalGainLoss >= 0 ? 'bg-gradient-to-br from-green-400/10 to-green-400/5' : 'bg-gradient-to-br from-red-400/10 to-red-400/5'
         }`}></div>
-        <div className={`absolute top-0 right-0 w-24 h-24 ${
+        <div className={`absolute top-0 right-0 w-20 sm:w-24 h-20 sm:h-24 ${
           metrics.totalGainLoss >= 0 ? 'success-gradient' : 'danger-gradient'
         } opacity-25 rounded-full blur-xl`}></div>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
           <CardTitle className="text-sm font-medium text-muted-foreground">Unrealized P&L</CardTitle>
           {metrics.totalGainLoss >= 0 ? (
-            <TrendingUp className="h-5 w-5 text-green-400" />
+            <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-green-400" />
           ) : (
-            <TrendingDown className="h-5 w-5 text-red-400" />
+            <TrendingDown className="h-4 w-4 sm:h-5 sm:w-5 text-red-400" />
           )}
         </CardHeader>
         <CardContent className="relative z-10">
-          <div className={`text-3xl font-bold ${
+          <div className={`text-2xl sm:text-3xl font-bold ${
             metrics.totalGainLoss >= 0 ? "text-green-400" : "text-red-400"
           }`}>
             {formatCurrency(metrics.totalGainLoss)}
@@ -79,10 +79,10 @@ export function PortfolioOverview({ metrics }: PortfolioOverviewProps) {
         <div className="absolute top-0 right-0 w-20 h-20 bg-blue-400/20 rounded-full blur-xl"></div>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
           <CardTitle className="text-sm font-medium text-muted-foreground">Top Performer</CardTitle>
-          <Zap className="h-5 w-5 text-blue-400" />
+          <Zap className="h-4 w-4 sm:h-5 sm:w-5 text-blue-400" />
         </CardHeader>
         <CardContent className="relative z-10">
-          <div className="text-3xl font-bold text-blue-400">
+          <div className="text-2xl sm:text-3xl font-bold text-blue-400 truncate">
             {metrics.topPerformer?.symbol || "N/A"}
           </div>
           <p className="text-xs text-blue-400 mt-1">

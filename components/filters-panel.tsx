@@ -1,11 +1,13 @@
 "use client"
 
-import { Calendar, Filter, RotateCcw, TrendingUp, TrendingDown, DollarSign } from "lucide-react"
+import { useState } from "react"
+import { Calendar, Filter, RotateCcw, TrendingUp, TrendingDown, DollarSign, ChevronDown, ChevronUp } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
+import { useResponsive } from "@/hooks/use-mobile"
 import type { FilterState, Holding } from "@/lib/types"
 
 interface FiltersPanelProps {
@@ -15,6 +17,8 @@ interface FiltersPanelProps {
 }
 
 export function FiltersPanel({ filters, holdings, onFiltersChange }: FiltersPanelProps) {
+  const [isExpanded, setIsExpanded] = useState(false)
+  const { isMobile } = useResponsive()
   const uniqueSectors = Array.from(new Set(holdings.map((h) => h.sector))).sort()
 
   // Calculate min/max values for range filters
@@ -56,148 +60,162 @@ export function FiltersPanel({ filters, holdings, onFiltersChange }: FiltersPane
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Filter className="h-5 w-5" />
-          Advanced Filters
-        </CardTitle>
-        <CardDescription>Filter and analyze your portfolio data</CardDescription>
+      <CardHeader 
+        className={`${isMobile ? 'cursor-pointer' : ''} ${isMobile ? 'pb-2' : ''}`}
+        onClick={() => isMobile && setIsExpanded(!isExpanded)}
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Filter className="h-4 w-4 sm:h-5 sm:w-5" />
+            <CardTitle className="text-base sm:text-lg">Advanced Filters</CardTitle>
+          </div>
+          {isMobile && (
+            <Button variant="ghost" size="sm">
+              {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </Button>
+          )}
+        </div>
+        {!isMobile && (
+          <CardDescription className="text-sm">Filter and analyze your portfolio data</CardDescription>
+        )}
       </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Basic Filters */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="sector-filter">Sector</Label>
-            <Select value={filters.sector} onValueChange={(value) => onFiltersChange({ sector: value })}>
-              <SelectTrigger id="sector-filter">
-                <SelectValue placeholder="All sectors" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Sectors</SelectItem>
-                {uniqueSectors.map((sector) => (
-                  <SelectItem key={sector} value={sector}>
-                    {sector} ({holdings.filter((h) => h.sector === sector).length})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+      
+      {(!isMobile || isExpanded) && (
+        <CardContent className="space-y-4 sm:space-y-6">
+          {/* Basic Filters */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="sector-filter" className="text-sm">Sector</Label>
+              <Select value={filters.sector} onValueChange={(value) => onFiltersChange({ sector: value })}>
+                <SelectTrigger id="sector-filter" className="h-9 sm:h-10">
+                  <SelectValue placeholder="All sectors" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Sectors</SelectItem>
+                  {uniqueSectors.map((sector) => (
+                    <SelectItem key={sector} value={sector}>
+                      {sector} ({holdings.filter((h) => h.sector === sector).length})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="start-date">Start Date</Label>
-            <div className="relative">
-              <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                id="start-date"
-                type="date"
-                value={filters.dateRange.start}
-                onChange={(e) =>
-                  onFiltersChange({
-                    dateRange: { ...filters.dateRange, start: e.target.value },
-                  })
-                }
-                className="pl-10"
-              />
+            <div className="space-y-2">
+              <Label htmlFor="start-date" className="text-sm">Start Date</Label>
+              <div className="relative">
+                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
+                <Input
+                  id="start-date"
+                  type="date"
+                  value={filters.dateRange.start}
+                  onChange={(e) =>
+                    onFiltersChange({
+                      dateRange: { ...filters.dateRange, start: e.target.value },
+                    })
+                  }
+                  className="pl-9 sm:pl-10 h-9 sm:h-10 text-sm"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="end-date" className="text-sm">End Date</Label>
+              <div className="relative">
+                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
+                <Input
+                  id="end-date"
+                  type="date"
+                  value={filters.dateRange.end}
+                  onChange={(e) =>
+                    onFiltersChange({
+                      dateRange: { ...filters.dateRange, end: e.target.value },
+                    })
+                  }
+                  className="pl-9 sm:pl-10 h-9 sm:h-10 text-sm"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              {!isMobile && <Label>&nbsp;</Label>}
+              <Button
+                variant="outline"
+                onClick={handleReset}
+                disabled={!hasActiveFilters}
+                className="w-full bg-transparent h-9 sm:h-10 text-sm"
+              >
+                <RotateCcw className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
+                Reset Filters
+              </Button>
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="end-date">End Date</Label>
-            <div className="relative">
-              <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                id="end-date"
-                type="date"
-                value={filters.dateRange.end}
-                onChange={(e) =>
-                  onFiltersChange({
-                    dateRange: { ...filters.dateRange, end: e.target.value },
-                  })
-                }
-                className="pl-10"
-              />
+          {/* Quick Filter Buttons */}
+          <div className="space-y-3">
+            <Label className="text-sm">Quick Filters</Label>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onFiltersChange({ sector: "Technology" })}
+                className="h-8 text-xs sm:text-sm"
+              >
+                Tech Stocks
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  // Filter to show only profitable holdings
+                  const profitableHoldings = holdings.filter((h) => h.unrealizedGainLoss > 0)
+                  if (profitableHoldings.length > 0) {
+                    // This would need additional filter state to work properly
+                    // For now, just show a visual indication
+                  }
+                }}
+                className="h-8 text-success border-success/20 hover:bg-success/10 text-xs sm:text-sm"
+              >
+                <TrendingUp className="h-3 w-3 mr-1" />
+                Winners
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  // Filter to show only losing holdings
+                  const losingHoldings = holdings.filter((h) => h.unrealizedGainLoss < 0)
+                  if (losingHoldings.length > 0) {
+                    // This would need additional filter state to work properly
+                  }
+                }}
+                className="h-8 text-destructive border-destructive/20 hover:bg-destructive/10 text-xs sm:text-sm"
+              >
+                <TrendingDown className="h-3 w-3 mr-1" />
+                Losers
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  // Filter to show high-value holdings
+                  const highValueHoldings = holdings.filter((h) => h.currentValue > 10000)
+                  if (highValueHoldings.length > 0) {
+                    // This would need additional filter state to work properly
+                  }
+                }}
+                className="h-8 text-xs sm:text-sm"
+              >
+                <DollarSign className="h-3 w-3 mr-1" />
+                High Value
+              </Button>
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label>&nbsp;</Label>
-            <Button
-              variant="outline"
-              onClick={handleReset}
-              disabled={!hasActiveFilters}
-              className="w-full bg-transparent"
-            >
-              <RotateCcw className="h-4 w-4 mr-2" />
-              Reset Filters
-            </Button>
-          </div>
-        </div>
-
-        {/* Quick Filter Buttons */}
-        <div className="space-y-3">
-          <Label>Quick Filters</Label>
-          <div className="flex flex-wrap gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onFiltersChange({ sector: "Technology" })}
-              className="h-8"
-            >
-              Tech Stocks
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                // Filter to show only profitable holdings
-                const profitableHoldings = holdings.filter((h) => h.unrealizedGainLoss > 0)
-                if (profitableHoldings.length > 0) {
-                  // This would need additional filter state to work properly
-                  // For now, just show a visual indication
-                }
-              }}
-              className="h-8 text-success border-success/20 hover:bg-success/10"
-            >
-              <TrendingUp className="h-3 w-3 mr-1" />
-              Winners
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                // Filter to show only losing holdings
-                const losingHoldings = holdings.filter((h) => h.unrealizedGainLoss < 0)
-                if (losingHoldings.length > 0) {
-                  // This would need additional filter state to work properly
-                }
-              }}
-              className="h-8 text-destructive border-destructive/20 hover:bg-destructive/10"
-            >
-              <TrendingDown className="h-3 w-3 mr-1" />
-              Losers
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                // Filter to show high-value holdings
-                const highValueHoldings = holdings.filter((h) => h.currentValue > 10000)
-                if (highValueHoldings.length > 0) {
-                  // This would need additional filter state to work properly
-                }
-              }}
-              className="h-8"
-            >
-              <DollarSign className="h-3 w-3 mr-1" />
-              High Value
-            </Button>
-          </div>
-        </div>
-
-        {/* Filter Summary */}
-        {hasActiveFilters && (
-          <div className="space-y-3 pt-4 border-t">
-            <Label>Active Filters</Label>
+          {/* Filter Summary */}
+          {hasActiveFilters && (
+            <div className="space-y-3 pt-4 border-t">
+              <Label className="text-sm">Active Filters</Label>
             <div className="flex flex-wrap gap-2">
               {filters.sector !== "all" && (
                 <Button
@@ -275,6 +293,7 @@ export function FiltersPanel({ filters, holdings, onFiltersChange }: FiltersPane
           </div>
         </div>
       </CardContent>
+      )}
     </Card>
   )
 }
